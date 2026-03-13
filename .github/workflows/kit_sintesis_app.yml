@@ -1,0 +1,40 @@
+# kit_sintesis_app.yml — Workflow CI/CD de Kit
+name: KIT — Sintetizador de Apps
+
+on:
+  repository_dispatch:
+    types: [iniciar-sintesis-app]
+
+jobs:
+  sintesis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del Repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Instalar Dependencias
+        run: pip install anthropic
+
+      - name: Ejecutar Orquestador Kit
+        env:
+          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+          APP_GENOME:     ${{ toJson(github.event.client_payload) }}
+        run: python tools/orchestrators/orquestador_kit.py
+
+      - name: Build & Watch (anti-crash)
+        run: |
+          ./gradlew assembleDebug 2>&1 | tee build_output.txt || \
+          python tools/orchestrators/orquestador_kit.py --mode reparar --crash_log build_output.txt
+
+      - name: Commit del Código Generado
+        run: |
+          git config --global user.name  "Kit-Bot"
+          git config --global user.email "bot@kit.app"
+          git add .
+          git commit -m "Kit-Bot: síntesis completada" || echo "No hay cambios que commitear"
+          git push
