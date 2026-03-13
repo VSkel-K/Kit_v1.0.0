@@ -1,8 +1,3 @@
-// ============================================================
-// KuboMapScreen.kt
-// Descripción: Pantalla del tablero Kubo Map.
-// ============================================================
-
 package com.dreiz.kit.ui.kubomap
 
 import androidx.compose.animation.AnimatedVisibility
@@ -40,17 +35,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import com.dreiz.kit.domain.kubomap.KuboDef
 import com.dreiz.kit.domain.kubomap.KuboState
+import com.dreiz.kit.ui.theme.AzulCobalto
+import com.dreiz.kit.ui.theme.FondoOscuroClay
+import com.dreiz.kit.ui.theme.GrisArcilla
+import com.dreiz.kit.ui.theme.Hueso
+import com.dreiz.kit.ui.theme.Mandarina
+import com.dreiz.kit.ui.theme.components.ClayContainer
 import kotlin.math.roundToInt
 
 // ── TOKENS DE TEMA ────────────────────────────────────────────
-private val FondoOscuro   = Color(0xFF070A0F)
-private val LineaMalla    = Color(0xFF1A2035)
-private val AzulCobalto   = Color(0xFF0047AB)
-private val Mandarina     = Color(0xFFFF8C00)
-private val GrisArcilla   = Color(0xFF4A4A48)
-private val BlancoHueso   = Color(0xFFF9F6EE)
-private val AcentoCyan    = Color(0xFF06B6D4)
-private val PurpleAccent  = Color(0xFF7C3AED)
+// Usando la paleta de colores Claymorphic definida en Theme.kt
+private val LineaMalla    = Color(0xFF1A2035) // Mantener para la malla, ajustar si es necesario
+private val AcentoCyan    = Color(0xFF06B6D4) // Mantener por ahora, ajustar si es necesario
+private val PurpleAccent  = Color(0xFF7C3AED) // Mantener por ahora, ajustar si es necesario
 
 // ── PANTALLA PRINCIPAL ─────────────────────────────────────────
 
@@ -64,7 +61,7 @@ fun KuboMapScreen(viewModel: KuboMapViewModel) {
 
     val kuboSeleccionado = state.kubos.find { it.state == KuboState.ACTIVE }
 
-    Row(modifier = Modifier.fillMaxSize().background(FondoOscuro)) {
+    Row(modifier = Modifier.fillMaxSize().background(FondoOscuroClay)) {
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -173,7 +170,7 @@ private fun CapaConexiones(
             drawPath(path, lineColor, style = Stroke(width = 3f))
             drawCircle(lineColor, 5f, Offset(startX, startY))
             drawCircle(lineColor, 7f, Offset(endX, endY))
-            drawCircle(FondoOscuro, 3f, Offset(endX, endY))
+            drawCircle(FondoOscuroClay, 3f, Offset(endX, endY))
         }
     }
 }
@@ -206,40 +203,17 @@ private fun KuboInteractivo(
     val isActive = kubo.state == KuboState.ACTIVE
     val isError  = kubo.state == KuboState.ERROR
 
-    Box(
+    ClayContainer(
         modifier = Modifier
             .offset { IntOffset(kubo.position.x.roundToInt(), kubo.position.y.roundToInt()) }
             .size(kuboSizeDp)
-            .scale(scale)
-            .shadow(
-                elevation = if (isDragging) 24.dp else 8.dp,
-                shape     = RoundedCornerShape(16.dp),
-                ambientColor = kuboColor.copy(alpha = 0.4f),
-                spotColor    = kuboColor.copy(alpha = 0.6f)
-            )
-            .clip(RoundedCornerShape(16.dp))
-            .background(if (isActive) kuboColor.copy(alpha = 0.25f) else Color(0xFF131924))
-            .border(
-                width = if (isActive || isDragging) 1.5.dp else 1.dp,
-                color = when {
-                    isError    -> Color(0xFFEF4444)
-                    isActive   -> kuboColor
-                    isDragging -> kuboColor.copy(alpha = 0.8f)
-                    else       -> kuboColor.copy(alpha = 0.35f)
-                },
-                shape = RoundedCornerShape(16.dp)
-            )
-            .pointerInput(kubo.kuboId) {
-                detectDragGestures(onDragEnd = { onDrop() }, onDragCancel = { onDrop() }) { change, dragAmount ->
-                    change.consume()
-                    onMove(dragAmount.x, dragAmount.y)
-                }
-            }
-            .clickable { onTap() },
-        contentAlignment = Alignment.Center
+            .scale(scale),
+        backgroundColor = if (isActive) kuboColor.copy(alpha = 0.25f) else FondoOscuroClay,
+        cornerRadius = 16.dp,
+        onClick = onTap
     ) {
         Box(modifier = Modifier.size(kuboSizeDp * 0.55f)) {
-            RenderKuboFigure(figureId = figureId, color = BlancoHueso)
+            RenderKuboFigure(figureId = figureId, color = Hueso)
         }
         if (isError) {
             Box(
@@ -248,7 +222,7 @@ private fun KuboInteractivo(
                     .offset(x = 4.dp, y = (-4).dp)
                     .size(10.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFFEF4444))
+                    .background(Mandarina) // Usar Mandarina para errores
             )
         }
     }
@@ -268,10 +242,10 @@ private fun PanelDetalleKubo(kubo: KuboDef, onClose: () -> Unit) {
         modifier = Modifier
             .width(260.dp)
             .fillMaxHeight()
-            .background(Color(0xFF0D1117))
+            .background(FondoOscuroClay)
             .border(
                 width = 1.dp,
-                color = Color(0xFF1A2035),
+                color = LineaMalla, // Mantener borde sutil
                 shape = RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp)
             )
             .padding(20.dp),
@@ -284,20 +258,18 @@ private fun PanelDetalleKubo(kubo: KuboDef, onClose: () -> Unit) {
         ) {
             Text(
                 text       = kubo.kuboId.uppercase(),
-                color      = Color.White,
+                color      = Hueso,
                 fontWeight = FontWeight.ExtraBold,
                 fontSize   = 11.sp,
                 letterSpacing = 2.sp
             )
-            Box(
-                modifier = Modifier
-                    .size(24.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF1F2937))
-                    .clickable { onClose() },
-                contentAlignment = Alignment.Center
+            ClayContainer(
+                onClick = onClose,
+                backgroundColor = GrisArcilla,
+                cornerRadius = 12.dp,
+                modifier = Modifier.size(24.dp)
             ) {
-                Text("×", color = Color(0xFF6B7280), fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Text("×", color = Hueso, fontSize = 14.sp, fontWeight = FontWeight.Bold)
             }
         }
         Row(
@@ -312,22 +284,26 @@ private fun PanelDetalleKubo(kubo: KuboDef, onClose: () -> Unit) {
         KuboDetailRow("POS X",   "%.0f".format(kubo.position.x))
         KuboDetailRow("POS Y",   "%.0f".format(kubo.position.y))
         Spacer(Modifier.weight(1f))
-        Text(text = "Kit · Kubo Map 1.0", color = Color(0xFF1F2937), fontSize = 9.sp, letterSpacing = 1.sp)
+        Text(text = "Kit · Kubo Map 1.0", color = LineaMalla, fontSize = 9.sp, letterSpacing = 1.sp)
     }
 }
 
 @Composable
 private fun KuboDetailRow(label: String, value: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(Color(0xFF111827))
-            .padding(horizontal = 10.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+    ClayContainer(
+        backgroundColor = GrisArcilla.copy(alpha = 0.5f), // Fondo más suave para la fila
+        cornerRadius = 8.dp,
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Text(label, color = Color(0xFF374151), fontSize = 9.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
-        Text(value, color = Color(0xFF9CA3AF), fontSize = 11.sp, fontWeight = FontWeight.Medium)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(label, color = Hueso.copy(alpha = 0.7f), fontSize = 9.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
+            Text(value, color = Hueso, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+        }
     }
 }

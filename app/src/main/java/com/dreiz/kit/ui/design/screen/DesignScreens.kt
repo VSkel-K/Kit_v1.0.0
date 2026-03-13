@@ -14,38 +14,57 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dreiz.kit.ui.design.model.*
 import com.dreiz.kit.ui.design.viewmodel.*
+import com.dreiz.kit.ui.theme.AzulCobalto
+import com.dreiz.kit.ui.theme.FondoOscuroClay
+import com.dreiz.kit.ui.theme.Mandarina
+import com.dreiz.kit.ui.theme.Hueso
+import com.dreiz.kit.ui.theme.GrisArcilla
+import com.dreiz.kit.ui.theme.components.ClayContainer
 
 @Composable
 fun EntryScreen(onImageChoice: () -> Unit, onQuestionnaireChoice: () -> Unit) {
     Column(
-        modifier = Modifier.fillMaxSize().background(Color(0xFF070A0F)).padding(24.dp),
+        modifier = Modifier.fillMaxSize().background(FondoOscuroClay).padding(24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("KIT", color = Color.White, fontSize = 40.sp, fontWeight = FontWeight.ExtraBold)
+        Text("KIT", color = Hueso, fontSize = 40.sp, fontWeight = FontWeight.ExtraBold)
         Spacer(Modifier.height(8.dp))
-        Text("AI DESIGN SYSTEM FORGE", color = Color(0xFF06B6D4), fontSize = 10.sp, letterSpacing = 4.sp)
+        Text("AI DESIGN SYSTEM FORGE", color = AzulCobalto, fontSize = 10.sp, letterSpacing = 4.sp)
         Spacer(Modifier.height(48.dp))
         
-        Button(
+        ClayContainer(
             onClick = onQuestionnaireChoice,
-            modifier = Modifier.fillMaxWidth().height(56.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7C3AED))
+            backgroundColor = Mandarina,
+            cornerRadius = 24.dp,
+            modifier = Modifier.fillMaxWidth().height(56.dp)
         ) {
-            Text("Iniciar Cuestionario", fontWeight = FontWeight.Bold)
+            Text("Iniciar Cuestionario", fontWeight = FontWeight.Bold, color = FondoOscuroClay)
+        }
+        Spacer(Modifier.height(16.dp))
+        ClayContainer(
+            onClick = onImageChoice,
+            backgroundColor = GrisArcilla,
+            cornerRadius = 24.dp,
+            modifier = Modifier.fillMaxWidth().height(56.dp)
+        ) {
+            Text("Subir Imagen", fontWeight = FontWeight.Bold, color = Hueso)
         }
     }
 }
 
 @Composable
 fun QuestionnaireScreen(onComplete: (Map<String, List<String>>, String) -> Unit) {
-    // Versión simplificada para demo
-    Column(modifier = Modifier.fillMaxSize().background(Color(0xFF070A0F)).padding(24.dp)) {
-        Text("Configura tu App", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+    Column(modifier = Modifier.fillMaxSize().background(FondoOscuroClay).padding(24.dp)) {
+        Text("Configura tu App", color = Hueso, fontSize = 24.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(24.dp))
-        Button(onClick = { onComplete(emptyMap(), "My Awesome App") }) {
-            Text("Generar con valores por defecto")
+        ClayContainer(
+            onClick = { onComplete(emptyMap(), "My Awesome App") },
+            backgroundColor = AzulCobalto,
+            cornerRadius = 24.dp,
+            modifier = Modifier.fillMaxWidth().height(56.dp)
+        ) {
+            Text("Generar con valores por defecto", color = Hueso)
         }
     }
 }
@@ -56,18 +75,32 @@ fun DesignSystemSelectorScreen(
     onVariantSelected: (String) -> Unit,
     onContinue: () -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxSize().background(Color(0xFF070A0F)).padding(24.dp)) {
-        Text("Elige un Estilo", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+    Column(modifier = Modifier.fillMaxSize().background(FondoOscuroClay).padding(24.dp)) {
+        Text("Elige un Estilo", color = Hueso, fontSize = 24.sp, fontWeight = FontWeight.Bold)
         if (uiState.isGenerating) {
-            CircularProgressIndicator(color = Color(0xFF06B6D4))
+            CircularProgressIndicator(color = AzulCobalto)
         } else {
             uiState.variants.forEach { variant ->
-                Button(onClick = { onVariantSelected(variant.id) }) {
-                    Text(variant.name)
+                ClayContainer(
+                    onClick = { onVariantSelected(variant.id) },
+                    backgroundColor = GrisArcilla,
+                    cornerRadius = 16.dp,
+                    modifier = Modifier.fillMaxWidth().height(48.dp)
+                ) {
+                    Text(variant.name, color = Hueso)
                 }
+                Spacer(Modifier.height(8.dp))
             }
             if (uiState.selectedVariantId != null) {
-                Button(onClick = onContinue) { Text("Continuar") }
+                Spacer(Modifier.height(16.dp))
+                ClayContainer(
+                    onClick = onContinue,
+                    backgroundColor = Mandarina,
+                    cornerRadius = 24.dp,
+                    modifier = Modifier.fillMaxWidth().height(56.dp)
+                ) {
+                    Text("Continuar", color = FondoOscuroClay)
+                }
             }
         }
     }
@@ -75,9 +108,9 @@ fun DesignSystemSelectorScreen(
 
 @Composable
 fun BuilderScreen(config: AppForgeConfig) {
-    Column(modifier = Modifier.fillMaxSize().background(Color(0xFF070A0F)).padding(24.dp)) {
-        Text("PROYECTO LISTO", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-        Text("App: ${config.appName}", color = Color.Gray)
-        Text("Estilo: ${config.selectedVariant?.name ?: "N/A"}", color = Color.Gray)
+    Column(modifier = Modifier.fillMaxSize().background(FondoOscuroClay).padding(24.dp)) {
+        Text("PROYECTO LISTO", color = Hueso, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Text("App: ${config.appName}", color = Hueso.copy(alpha = 0.7f))
+        Text("Estilo: ${config.selectedVariant?.name ?: "N/A"}", color = Hueso.copy(alpha = 0.7f))
     }
 }
