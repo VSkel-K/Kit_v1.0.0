@@ -1,10 +1,11 @@
 package com.dreiz.kit.ui.theme
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
@@ -33,7 +34,11 @@ fun Modifier.innerShadow(
         )
 
         val rect = Rect(Offset.Zero, size)
-        val path = Path().apply { addRoundRect(rect, shapeRadius.toPx(), shapeRadius.toPx()) }
+        val roundRect = RoundRect(
+            rect = rect,
+            cornerRadius = CornerRadius(shapeRadius.toPx(), shapeRadius.toPx())
+        )
+        val path = Path().apply { addRoundRect(roundRect) }
 
         it.drawPath(path, paint)
     }
@@ -59,7 +64,11 @@ fun Modifier.dropShadow(
         )
 
         val rect = Rect(Offset.Zero, size)
-        val path = Path().apply { addRoundRect(rect, shapeRadius.toPx(), shapeRadius.toPx()) }
+        val roundRect = RoundRect(
+            rect = rect,
+            cornerRadius = CornerRadius(shapeRadius.toPx(), shapeRadius.toPx())
+        )
+        val path = Path().apply { addRoundRect(roundRect) }
 
         it.drawPath(path, paint)
     }
